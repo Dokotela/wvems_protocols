@@ -11,13 +11,9 @@ class HomePdfScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    controller.resetPdfUI();
     return OrientationBuilder(
       builder: (context, orientation) {
-        if (orientation != controller.currentOrientation) {
-          controller.currentOrientation = orientation;
-          controller.resetPdfUI(goHome: false);
-        }
+        controller.resetPdfUI();
         return Obx(
           () => Container(
             child:
@@ -37,15 +33,12 @@ class HomePdfScreen extends StatelessWidget {
                             fitPolicy: FitPolicy.BOTH,
                             // if set to true, the link is handled in flutter
                             preventLinkNavigation: false,
-                            // onRender: (intArg) => controller.onPdfRender,
                             onError: controller.onPdfError,
                             onPageError: (intArg, dynamicArg) =>
                                 controller.onPdfPageError,
                             onViewCreated: controller.onPdfViewCreated,
                             onLinkHandler: (stringArg) =>
                                 controller.onPdfLinkHandler,
-                            // onPageChanged: (int1Arg, int2Arg) =>
-                            //     controller.onPdfPageChanged,
                           )
                         : const Center(child: CircularProgressIndicator())
                     : Center(

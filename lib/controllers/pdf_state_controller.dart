@@ -40,8 +40,6 @@ class PdfStateController extends GetxController with WidgetsBindingObserver {
   final RxString asset = ''.obs;
   final RxInt activeYear = 2020.obs;
 
-  Orientation? currentOrientation = Get.context?.orientation;
-
   /// Unique Key required for screen layout changes in Android
   /// More details about this bug and its solution available here
   /// https://github.com/endigo/flutter_pdfview/issues/9#issuecomment-621162440
@@ -85,39 +83,9 @@ class PdfStateController extends GetxController with WidgetsBindingObserver {
     return f;
   }
 
-  void resetPdfUI({bool goHome = true}) {
-    // set new UniqueKey, which triggers a UI redraw
-    // UniqueKey is most important w/ Android redraws
-    pdfViewerKey = UniqueKey();
-    if (goHome) {
-      currentPage.value = 0;
-    }
-  }
-
-  /// **********************************************************
-  /// ************ PDF CONTROLLER CONFIG METHODS ***************
-  /// **********************************************************
-
-  // Future<bool> _createNewPdfController() async {
-  //   asyncController = Completer<PDFViewController>();
-  //   final newController = asyncController.future;
-  //   await _setOrResetRxPdfController(newController);
-  //   return true;
-  // }
-
-  // Future<void> _setOrResetRxPdfController(
-  //     Future<PDFViewController> newController) async {
-  //   if (rxPdfController != null) {
-  //     rxPdfController!.value = await newController;
-  //   } else {
-  //     rxPdfController = (await newController).obs;
-  //   }
-  // }
-
-  /// This methods establishes the PDFViewController on first load
-  /// If the active pdf ever changes...
-  /// This completer will re-run to reset the controller
-  /// todo: verify if this controller needs/takes a dispose() method
+  // set new UniqueKey, which triggers a UI redraw
+  // UniqueKey is most important w/ Android redraws
+  void resetPdfUI() => pdfViewerKey = UniqueKey();
 
   /// **********************************************************
   /// *************** PDF TEXT STATE METHODS *******************
@@ -167,6 +135,7 @@ class PdfStateController extends GetxController with WidgetsBindingObserver {
 
   @override
   Future<void> onInit() async {
+    print('onInit');
     super.onInit();
     // Used for first load of embedded PDF
     await loadNewPdf(2020, AppAssets.PROTOCOL_2020);
@@ -177,6 +146,7 @@ class PdfStateController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    print('onClose');
     WidgetsBinding.instance?.removeObserver(this);
     super.onClose();
   }
@@ -202,14 +172,14 @@ class PdfStateController extends GetxController with WidgetsBindingObserver {
   /// will cause a memory leak
   Future onPdfViewCreated(PDFViewController pdfViewController) async {
     print('viewCreated');
-    pdfController = null;
     pdfController = pdfViewController;
     await pdfController!.setPage(currentPage.value);
   }
 
-  Future setPdfPage(int? page) async {
-    print('setPage: $page');
-    await pdfController!.setPage(page ?? 0);
+  Future setPdfPage(int page) async {
+    print('setPdfPage');
+    await pdfController!.setPage(page);
+    currentPage.value = page;
   }
 
   void onPdfLinkHandler(String uri) {
